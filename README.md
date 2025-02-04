@@ -1,6 +1,6 @@
-# MySQL Data Access Framework
+# dbBox API
 
-Welcome to the **MySQL Data Access Framework** – a lightweight, robust, and asynchronous library designed to simplify working with MySQL databases in Java. This framework provides a clean API for managing connection pools, executing queries and updates, handling transactions, and even building and modifying tables on the fly. It comes with extensive error handling, logging, and resource management features to ensure your database interactions are both efficient and reliable.
+Welcome to the **dbBox API** – a lightweight, robust, and asynchronous library designed to simplify working with MySQL databases in Java. This framework provides a clean API for managing connection pools, executing queries and updates, handling transactions, and even building and modifying tables on the fly. It comes with extensive error handling, logging, and resource management features to ensure your database interactions are both efficient and reliable.
 
 ## Key Features
 
