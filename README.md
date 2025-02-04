@@ -25,30 +25,46 @@ Welcome to the **MySQL Data Access Framework** – a lightweight, robust, and as
 - **AutoCloseable Resource Management**  
   Both the query results (via `DatabaseResultMySQL`) and database connections are managed using AutoCloseable patterns to prevent resource leaks.
 
-## Getting Started
+## Usage Example
 
-1. **Setup**  
-   Add the framework to your project via your preferred dependency management tool (Maven, Gradle, etc.) or simply include the source code in your project.
+The following example demonstrates how to use the framework. It shows how to initialize the database connection, create a table, retrieve data from the table, and shut down the manager properly.
 
-2. **Configuration**  
-   Create a `DatasourceMySQL` instance with your database connection details (host, port, database name, user, and password).
+```java
+import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 
-3. **Usage**  
-   Use the provided API methods to execute queries and updates asynchronously:
-   
-   ```java
-   DatasourceMySQL datasource = new DatasourceMySQL("localhost", 3306, "my_database", "user", "password");
-   DatasourceManagerMySQL dbManager = new DatasourceManagerMySQL(datasource);
-   
-   // Asynchronous Query
-   dbManager.executeQuery("SELECT * FROM my_table WHERE id = ?", 1)
-            .thenAccept(result -> {
-                while (result.next()) {
-                    System.out.println("Value: " + result.getString("column_name"));
-                }
-                result.close();
-            });
-   
-   // Asynchronous Update
-   dbManager.executeUpdate("UPDATE my_table SET column_name = ? WHERE id = ?", "newValue", 1)
-            .thenRun(() -> System.out.println("Update successful!"));
+public class Example {
+    public static void main(String[] args) {
+        // Initialize the database connection details.
+        DatabaseInfo info = new DatabaseInfo("localhost", 3306, "website", "username", "secret");
+        DatabaseManager manager = new DatabaseManager(info);
+        
+        // Create table "groups" with columns "uuid", "name", and "permissions"
+        // Note: The create() method may execute asynchronously. If needed, wait for its completion.
+        manager.createTable("groups")
+               .addString("uuid")
+               .addString("name")
+               .addString("permissions")
+               .create();
+        
+        // Retrieve the table instance (using "uuid" as the identifier column).
+        Table groups = manager.getTable("groups", "uuid");
+        
+        // Generate a random UUID.
+        UUID uuid = UUID.randomUUID();
+        
+        // Attempt to retrieve the value of the "name" column for the given UUID.
+        // This call blocks until the asynchronous operation completes.
+        try {
+            String name = groups.get("name", uuid.toString())
+                                .get()  // Blocks until the result is available
+                                .asString();
+            System.out.println("Name: " + name);
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+        
+        // Shutdown the database manager to close all connections and release resources.
+        manager.shutdown();
+    }
+}
