@@ -136,22 +136,23 @@ public class DatasourceManagerMySQL {
         if (values == null)
             throw new IllegalArgumentException("The values array cannot be null");
         return CompletableFuture.supplyAsync(() -> {
-            final DatabaseResultMySQL[] result = new DatabaseResultMySQL[1];
+            final DatabaseResultMySQL[] resultHolder = new DatabaseResultMySQL[1];
             try {
                 runSecureOperation(connection -> {
-                    try (PreparedStatement statement = connection.prepareStatement(query)) {
-                        setStatementParameters(statement, values);
-                        try (ResultSet resultSet = statement.executeQuery()) {
-                            result[0] = new DatabaseResultMySQL(resultSet);
-                        }
-                    }
+                    // Hier kein try-with-resources für PreparedStatement und ResultSet!
+                    PreparedStatement statement = connection.prepareStatement(query);
+                    setStatementParameters(statement, values);
+                    ResultSet resultSet = statement.executeQuery();
+                    // Übergebe beide Ressourcen an DatabaseResultMySQL
+                    resultHolder[0] = new DatabaseResultMySQL(resultSet, statement);
                 });
             } catch (Exception exception) {
                 throw new CompletionException(getErrorMessage(query, values), exception);
             }
-            return result[0];
+            return resultHolder[0];
         }, executor);
     }
+
 
     /**
      * Führt ein Update asynchron aus.

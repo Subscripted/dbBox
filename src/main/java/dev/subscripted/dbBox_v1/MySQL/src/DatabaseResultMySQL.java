@@ -1,13 +1,19 @@
 package dev.subscripted.dbBox_v1.MySQL.src;
 
 import dev.subscripted.dbBox_v1.MySQL.exception.DatabaseException;
+
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-/**
- * Hüllt ein ResultSet ein und stellt Methoden zum Auslesen bereit.
- */
-public record DatabaseResultMySQL(ResultSet result) implements AutoCloseable {
+public class DatabaseResultMySQL implements AutoCloseable {
+    private final ResultSet result;
+    private final PreparedStatement statement;
+
+    public DatabaseResultMySQL(ResultSet result, PreparedStatement statement) {
+        this.result = result;
+        this.statement = statement;
+    }
 
     public boolean next() {
         try {
@@ -15,6 +21,10 @@ public record DatabaseResultMySQL(ResultSet result) implements AutoCloseable {
         } catch (SQLException exception) {
             throw new DatabaseException("Error while navigating through the ResultSet.", exception);
         }
+    }
+
+    public ResultSet getResultSet() {
+        return result;
     }
 
     public int getColumnCount() {
@@ -92,9 +102,19 @@ public record DatabaseResultMySQL(ResultSet result) implements AutoCloseable {
     @Override
     public void close() {
         try {
-            result.close();
+            if (result != null && !result.isClosed()) {
+                result.close();
+            }
         } catch (SQLException exception) {
             throw new DatabaseException("Error occurred while trying to close the ResultSet.", exception);
+        } finally {
+            try {
+                if (statement != null && !statement.isClosed()) {
+                    statement.close();
+                }
+            } catch (SQLException exception) {
+                throw new DatabaseException("Error occurred while trying to close the PreparedStatement.", exception);
+            }
         }
     }
 }
