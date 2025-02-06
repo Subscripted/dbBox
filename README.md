@@ -76,7 +76,7 @@ public class Example {
 ## preparedSelect
 
 
-``jsva
+```java
 import dev.subscripted.dbBox_v1.MySQL.src.DatasourceManagerMySQL;
 import dev.subscripted.dbBox_v1.MySQL.src.DatasourceMySQL;
 import dev.subscripted.dbBox_v1.MySQL.table.Table;
