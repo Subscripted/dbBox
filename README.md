@@ -68,3 +68,45 @@ public class Example {
         manager.shutdown();
     }
 }
+
+```
+
+
+
+## preparedSelect
+
+
+``jsva
+import dev.subscripted.dbBox_v1.MySQL.src.DatasourceManagerMySQL;
+import dev.subscripted.dbBox_v1.MySQL.src.DatasourceMySQL;
+import dev.subscripted.dbBox_v1.MySQL.table.Table;
+
+public class Main {
+    public static void main(String[] args) {
+        System.out.println("Hello, World!");
+
+        String[] data = {"id", "password", "auto_login"};
+
+        DatasourceMySQL db = new DatasourceMySQL("localhost", 3306, "dashboard", "root", "");
+        DatasourceManagerMySQL managerMySQL = new DatasourceManagerMySQL(db);
+        Table table = new Table(managerMySQL, "user", "id");
+
+        // Blockiere, bis die Abfrage fertig ist und schließe das Ergebnis danach
+        table.pselect(data, "user", "id", "1087700921808597063")
+             .thenAccept(resultSet -> {
+                 try {
+                     while (resultSet.next()) {
+                         System.out.println("ID: " + resultSet.getInt("id"));
+                         System.out.println("password: " + resultSet.getString("password"));
+                         System.out.println("auto_login: " + resultSet.getBoolean("auto_login"));
+                     }
+                 } finally {
+                     resultSet.close();
+                 }
+             })
+             .join();
+
+        managerMySQL.shutdown();
+    }
+    ```
+
