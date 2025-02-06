@@ -87,12 +87,13 @@ public class Main {
 
         String[] data = {"id", "password", "auto_login"};
 
-        DatasourceMySQL db = new DatasourceMySQL("localhost", 3306, "dashboard", "root", "");
+        DatasourceMySQL db = new DatasourceMySQL("localhost", 3306, "database", "root", "password");
         DatasourceManagerMySQL managerMySQL = new DatasourceManagerMySQL(db);
         Table table = new Table(managerMySQL, "user", "id");
 
-        // Blockiere, bis die Abfrage fertig ist und schließe das Ergebnis danach
-        table.pselect(data, "user", "id", "1087700921808597063")
+        // The sample shows you SELECT date FROM user WHERE id = ?
+
+        table.pselect(data, "user", "id", "0023902")
              .thenAccept(resultSet -> {
                  try {
                      while (resultSet.next()) {
