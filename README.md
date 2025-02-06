@@ -91,7 +91,7 @@ public class Main {
         DatasourceManagerMySQL managerMySQL = new DatasourceManagerMySQL(db);
         Table table = new Table(managerMySQL, "user", "id");
 
-        // The sample shows you SELECT data FROM user WHERE id = ?
+        // The example shows you SELECT data FROM user WHERE id = ?
 
         table.pselect(data, "user", "id", "0023902")
              .thenAccept(resultSet -> {
